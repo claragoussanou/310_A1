@@ -21,6 +21,7 @@ int help();
 int quit();
 int set(char *var, char *value);
 int print(char *var);
+int echo(char *var);
 int source(char *script);
 int badcommandFileDoesNotExist();
 
