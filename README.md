@@ -10,7 +10,9 @@ help | quit | set VAR STRING | print VAR | source SCRIPT.TXT
 
 OUR TASKS:
 1. add echo command
-2. fix batch mode so that $ is not displayed on every line and it terminates after unning all instructions in the file
+2. fix batch mode
+    - $ is not displayed on every line
+    - terminates after running all instructions in the file
 3. add my_ls command
 4. add my_mkdir command
 5. add my_touch command
