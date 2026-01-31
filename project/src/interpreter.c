@@ -3,6 +3,7 @@
 #include <string.h>
 #include "shellmemory.h"
 #include "shell.h"
+#include <unistd.h>
 
 int MAX_ARGS_SIZE = 3;
 
@@ -28,6 +29,12 @@ int badcommandFileDoesNotExist();
 // Interpret commands and their arguments
 int interpreter(char *command_args[], int args_size) {
     int i;
+
+    if (args_size == 0) {
+        if(!isatty(fileno(stdin))) {
+            return quit();
+        }
+    }
 
     if (args_size < 1 || args_size > MAX_ARGS_SIZE) {
         return badcommand();

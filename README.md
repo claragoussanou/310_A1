@@ -14,9 +14,9 @@ help | quit | set VAR STRING | print VAR | source SCRIPT.TXT
 
 OUR TASKS:
 1. [ DONE ] add echo command
-2. fix batch mode
+2. [ DONE ] fix batch mode
     - [ DONE ] $ is not displayed on every line
-    - terminates after running all instructions in the file
+    - [ DONE ] terminates after running all instructions in the file
 3. add my_ls command
 4. add my_mkdir command
 5. add my_touch command
