@@ -60,6 +60,11 @@ int interpreter(char *command_args[], int args_size) {
             return badcommand();
         return print(command_args[1]);
 
+    } else if (strcmp(command_args[0], "echo") == 0) {
+        if (args_size != 2)
+            return badcommand();
+        return echo(command_args[1]);
+
     } else if (strcmp(command_args[0], "source") == 0) {
         if (args_size != 2)
             return badcommand();
@@ -103,6 +108,20 @@ int set(char *var, char *value) {
 
 int print(char *var) {
     printf("%s\n", mem_get_value(var));
+    return 0;
+}
+
+int echo(char *var) {
+    if (var[0] == '$') {
+        char *result = mem_get_value(&var[1]);
+        if (strcmp(result,"Variable does not exist")) {
+            printf("%s\n", result);
+        } else {
+            printf("\n");
+        }
+    } else {
+    printf("%s\n", var);
+    }
     return 0;
 }
 
