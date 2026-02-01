@@ -4,6 +4,7 @@
 #include "shellmemory.h"
 #include "shell.h"
 #include <unistd.h>
+#include <dirent.h>
 
 int MAX_ARGS_SIZE = 3;
 
@@ -18,12 +19,20 @@ int badcommandFileDoesNotExist() {
     return 3;
 }
 
+int comp(const void *a,const void *b) {
+    return strcmp(*(const char **)a, *(const char **)b);
+}
+
+
 int help();
 int quit();
 int set(char *var, char *value);
 int print(char *var);
-int echo(char *var);
 int source(char *script);
+int echo(char *var);
+int my_ls();
+int my_mkdir(char *var);
+int my_touch(char *var);
 int badcommandFileDoesNotExist();
 
 int my_ls();
@@ -32,10 +41,8 @@ int my_ls();
 int interpreter(char *command_args[], int args_size) {
     int i;
 
-    if (args_size == 0) {
-        if(!isatty(fileno(stdin))) {
+    if (args_size == 0 && !isatty(fileno(stdin))) {
             return quit();
-        }
     }
 
     if (args_size < 1 || args_size > MAX_ARGS_SIZE) {
@@ -69,15 +76,34 @@ int interpreter(char *command_args[], int args_size) {
             return badcommand();
         return print(command_args[1]);
 
-    } else if (strcmp(command_args[0], "echo") == 0) {
-        if (args_size != 2)
-            return badcommand();
-        return echo(command_args[1]);
-
     } else if (strcmp(command_args[0], "source") == 0) {
         if (args_size != 2)
             return badcommand();
         return source(command_args[1]);
+
+    } else if (strcmp(command_args[0], "echo") == 0) {
+        //echo
+        if (args_size != 2)
+            return badcommand();
+        return echo(command_args[1]);
+
+    } else if (strcmp(command_args[0], "my_ls") == 0) {
+        //my_ls
+        if (args_size != 1)
+            return badcommand();
+        return my_ls();
+
+    } else if (strcmp(command_args[0], "my_mkdir") == 0) {
+        //my_mkdir
+        if (args_size != 2)
+            return badcommand();
+        return my_mkdir(command_args[1]);
+
+    } else if (strcmp(command_args[0], "my_touch") == 0) {
+        //my_touch
+        if (args_size != 2)
+            return badcommand();
+        return my_touch(command_args[1]);
 
      } else if (strcmp(command_args[0], "my_ls") == 0) {
         if (args_size != 1)
@@ -125,20 +151,6 @@ int print(char *var) {
     return 0;
 }
 
-int echo(char *var) {
-    if (var[0] == '$') {
-        char *result = mem_get_value(&var[1]);
-        if (strcmp(result,"Variable does not exist")) {
-            printf("%s\n", result);
-        } else {
-            printf("\n");
-        }
-    } else {
-    printf("%s\n", var);
-    }
-    return 0;
-}
-
 int source(char *script) {
     int errCode = 0;
     char line[MAX_USER_INPUT];
@@ -164,7 +176,54 @@ int source(char *script) {
     return errCode;
 }
 
-int my_ls() {
-    for (int i )
 
+int echo(char *var) {
+    if (var[0] == '$') {
+        char *result = mem_get_value(&var[1]);
+        if (strcmp(result,"Variable does not exist")) {
+            printf("%s\n", result);
+        } else {
+            printf("\n");
+        }
+    } else {
+    printf("%s\n", var);
+    }
+    return 0;
 }
+
+int my_ls() {
+    DIR *directory = opendir(".");
+    struct dirent *dircontents = readdir(directory);
+
+    int len = 0;
+    while (dircontents) {
+        len++;
+        dircontents = readdir(directory);
+    }
+
+    char *files[len];
+    rewinddir(directory);
+    struct dirent *dircontents2 = readdir(directory);
+    for (int i = 0; i < len; i++) {
+        files[i] = dircontents2->d_name;
+        dircontents2 = readdir(directory);
+    }
+    closedir(directory);
+
+    qsort(files,len, sizeof(char *),comp);
+    for (int i = 0; i < len; i++)
+        printf("%s\n", files[i]);
+    return 0;
+}
+
+int my_mkdir(char *var) {
+    
+    return 0;
+}
+
+int my_touch(char *var) {
+    FILE *fp = fopen(var,"w");
+    fclose(fp);
+    return 0;
+}
+
