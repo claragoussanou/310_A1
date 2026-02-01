@@ -5,6 +5,8 @@
 #include "shell.h"
 #include <unistd.h>
 #include <dirent.h>
+#include <sys/stat.h>
+#include <ctype.h>
 
 int MAX_ARGS_SIZE = 3;
 
@@ -24,6 +26,11 @@ int badcommandCD() {
     return 5;
 }
 
+int badcommandmkdir() {
+    printf("Bad command: my_mkdir\n");
+    return 4;
+}
+
 int comp(const void *a,const void *b) {
     return strcmp(*(const char **)a, *(const char **)b);
 }
@@ -39,8 +46,6 @@ int my_ls();
 int my_mkdir(char *var);
 int my_touch(char *var);
 int badcommandFileDoesNotExist();
-
-int my_ls();
 
 int my_cd(char *dirname);
 
@@ -229,11 +234,42 @@ int my_ls() {
 }
 
 int my_mkdir(char *var) {
-    
-    return 0;
+    int len = strlen(var);
+    for (int i = 1; i < len; i++){
+        if (!isalnum(var[i])) {
+            return badcommandmkdir();
+        }
+    }
+
+    if (var[0] == '$') {
+        char *result = mem_get_value(&var[1]);
+        if (strcmp(result,"Variable does not exist")) {
+            int i = 0;
+            while (result[i] != '\0') {
+                if (!isalnum(result[i])) {
+                    return badcommandmkdir();
+                }
+                i++;
+            }
+            mkdir(result,755);
+            return 0;
+        }
+        
+    } else if (isalnum(var[0])) {
+        mkdir(var,755);
+        return 0;
+    }
+    return badcommandmkdir();
 }
 
 int my_touch(char *var) {
+    int len = strlen(var);
+    for (int i = 1; i < len; i++){
+        if (!isalnum(var[i])) {
+            return badcommandmkdir();
+        }
+    }
+
     FILE *fp = fopen(var,"w");
     fclose(fp);
     return 0;

@@ -18,8 +18,8 @@ OUR TASKS:
     - [ DONE ] $ is not displayed on every line
     - [ DONE ] terminates after running all instructions in the file
 3. [ DONE ] add my_ls command
-4. add my_mkdir command
-5. add my_touch command
+4. [ DONE ] add my_mkdir command
+5. [ DONE ] add my_touch command
 6. add my_cd command
 7. implement one-liners
 8. add run command
