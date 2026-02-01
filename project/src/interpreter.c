@@ -46,7 +46,7 @@ int my_ls();
 int my_mkdir(char *var);
 int my_touch(char *var);
 int badcommandFileDoesNotExist();
-int my_cd(char *dirname);
+int my_cd(const char *dirname);
 
 // Interpret commands and their arguments
 int interpreter(char *command_args[], int args_size) {
@@ -270,7 +270,13 @@ int my_touch(char *var) {
 }
 
 int my_cd(const char *dirname) {
-    if (isalnum(dirname) && chdir(dirname)!= 0 ){
+    for (int i = 0; i< strlen(dirname); i++){
+        if (!isalnum(dirname)){
+            badcommandCD();
+        }
+    }
+
+    if (chdir(dirname)!= 0 ){
         badcommandCD();
     }
     return 0;
