@@ -46,7 +46,7 @@ int my_ls();
 int my_mkdir(char *var);
 int my_touch(char *var);
 int badcommandFileDoesNotExist();
-int my_cd( const char *dirname);
+int my_cd(char *dirname);
 
 // Interpret commands and their arguments
 int interpreter(char *command_args[], int args_size) {
