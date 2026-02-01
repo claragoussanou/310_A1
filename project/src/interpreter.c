@@ -28,9 +28,10 @@ int help();
 int quit();
 int set(char *var, char *value);
 int print(char *var);
-int echo(char *var);
 int source(char *script);
+int echo(char *var);
 int my_ls();
+int my_touch(char *var);
 int badcommandFileDoesNotExist();
 
 // Interpret commands and their arguments
@@ -72,6 +73,11 @@ int interpreter(char *command_args[], int args_size) {
             return badcommand();
         return print(command_args[1]);
 
+    } else if (strcmp(command_args[0], "source") == 0) {
+        if (args_size != 2)
+            return badcommand();
+        return source(command_args[1]);
+
     } else if (strcmp(command_args[0], "echo") == 0) {
         //echo
         if (args_size != 2)
@@ -84,10 +90,11 @@ int interpreter(char *command_args[], int args_size) {
             return badcommand();
         return my_ls();
 
-    } else if (strcmp(command_args[0], "source") == 0) {
+    } else if (strcmp(command_args[0], "my_touch") == 0) {
+        //echo
         if (args_size != 2)
             return badcommand();
-        return source(command_args[1]);
+        return my_touch(command_args[1]);
 
     } else
         return badcommand();
