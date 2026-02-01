@@ -271,7 +271,7 @@ int my_touch(char *var) {
 
 int my_cd(const char *dirname) {
     for (int i = 0; i< strlen(dirname); i++){
-        if (!isalnum(dirname)){
+        if (!isalnum(dirname[i])){
             badcommandCD();
         }
     }
