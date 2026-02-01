@@ -31,6 +31,7 @@ int print(char *var);
 int source(char *script);
 int echo(char *var);
 int my_ls();
+int my_mkdir(char *var);
 int my_touch(char *var);
 int badcommandFileDoesNotExist();
 
@@ -90,8 +91,14 @@ int interpreter(char *command_args[], int args_size) {
             return badcommand();
         return my_ls();
 
+    } else if (strcmp(command_args[0], "my_mkdir") == 0) {
+        //my_mkdir
+        if (args_size != 2)
+            return badcommand();
+        return my_mkdir(command_args[1]);
+
     } else if (strcmp(command_args[0], "my_touch") == 0) {
-        //echo
+        //my_touch
         if (args_size != 2)
             return badcommand();
         return my_touch(command_args[1]);
@@ -202,17 +209,14 @@ int my_ls() {
     return 0;
 }
 
+int my_mkdir(char *var) {
+    
+    return 0;
+}
+
 int my_touch(char *var) {
-    if (var[0] == '$') {
-        char *result = mem_get_value(&var[1]);
-        if (strcmp(result,"Variable does not exist")) {
-            printf("%s\n", result);
-        } else {
-            printf("\n");
-        }
-    } else {
-    printf("%s\n", var);
-    }
+    FILE *fp = fopen(var,"w");
+    fclose(fp);
     return 0;
 }
 
