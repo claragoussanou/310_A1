@@ -42,8 +42,6 @@ int my_mkdir(char *var);
 int my_touch(char *var);
 int badcommandFileDoesNotExist();
 
-int my_ls();
-
 // Interpret commands and their arguments
 int interpreter(char *command_args[], int args_size) {
     int i;
