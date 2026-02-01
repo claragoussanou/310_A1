@@ -7,6 +7,10 @@
 #include "shellmemory.h"
 
 int parseInput(char ui[]);
+struct instruction {
+    int instr_w;
+    char *instr_words[100];
+};
 
 // Start of everything
 int main(int argc, char *argv[]) {
@@ -48,9 +52,11 @@ int wordEnding(char c) {
 
 int parseInput(char inp[]) {
     char tmp[200], *words[100];                            
-    int ix = 0, w = 0;
+    int ix = 0, w = 0, instrlen = 0;
     int wordlen;
     int errorCode;
+    struct instruction instructions[10];
+
     for (ix = 0; inp[ix] == ' ' && ix < 1000; ix++); // skip white spaces
     while (inp[ix] != '\n' && inp[ix] != '\0' && ix < 1000) {
         // extract a word
@@ -60,9 +66,19 @@ int parseInput(char inp[]) {
         tmp[wordlen] = '\0';
         words[w] = strdup(tmp);
         w++;
+        if (inp[ix] == ';') {
+            struct instruction new_instr = {w, words};
+            
+            instructions[instrlen] = new_instr;
+            instrlen++;
+        }
+
         if (inp[ix] == '\0') break;
         ix++; 
     }
+
+
+
     errorCode = interpreter(words, w);
     return errorCode;
 }
