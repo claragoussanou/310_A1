@@ -31,6 +31,11 @@ int badcommandmkdir() {
     return 4;
 }
 
+int badcommandls() {
+    printf("Bad command: my_ls\n");
+    return 6;
+}
+
 int comp(const void *a,const void *b) {
     return strcmp(*(const char **)a, *(const char **)b);
 }
@@ -47,6 +52,7 @@ int my_mkdir(char *var);
 int my_touch(char *var);
 int badcommandFileDoesNotExist();
 int my_cd(const char *dirname);
+int run(char *command, char *var);
 
 // Interpret commands and their arguments
 int interpreter(char *command_args[], int args_size) {
@@ -204,6 +210,11 @@ int echo(char *var) {
 
 int my_ls() {
     DIR *directory = opendir(".");
+    if (!directory) {
+        badcommandls();
+    }
+
+
     struct dirent *dircontents = readdir(directory);
 
     int len = 0;
@@ -279,5 +290,10 @@ int my_cd(const char *dirname) {
     if (chdir(dirname)!= 0 ){
         badcommandCD();
     }
+    return 0;
+}
+
+int run(char *command, char *var) {
+    
     return 0;
 }
