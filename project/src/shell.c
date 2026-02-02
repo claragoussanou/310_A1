@@ -60,15 +60,15 @@ int parseInput(char inp[]) {
         }
         tmp[wordlen] = '\0';
         words[w] = strdup(tmp);
-        //puts("end word");
+        
         w++;
         if (inp[ix] == ';') {
-            errorCode = interpreter(words, w);
+            errorCode = interpreter(words, w); // interpret the instruction found
             if (errorCode == -1) exit(99); // handle the error here instead of main
             ix++;
             char nextInp[strlen(inp)];
-            strcpy(nextInp,inp+ix);
-            return parseInput(nextInp);
+            strcpy(nextInp,inp+ix); // 
+            return parseInput(nextInp); // recurse on the remainder of the input
         }
 
         if (inp[ix] == '\0') break;

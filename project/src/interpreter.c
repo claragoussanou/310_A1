@@ -7,6 +7,7 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include <ctype.h>
+#include <sys/wait.h>
 
 int MAX_ARGS_SIZE = 3;
 
@@ -21,21 +22,31 @@ int badcommandFileDoesNotExist() {
     return 3;
 }
 
+// For CD command only
 int badcommandCD() {
     printf("Bad command: my_cd\n");
     return 5;
 }
 
+// For mkdir command only
 int badcommandmkdir() {
     printf("Bad command: my_mkdir\n");
     return 4;
 }
 
+// For ls command only
 int badcommandls() {
     printf("Bad command: my_ls\n");
     return 6;
 }
 
+// For run command only
+int badcommandrun() {
+    printf("Bad command: run\n");
+    return 7;
+}
+
+// strcmp comparison function for quicksort (qsort)
 int comp(const void *a,const void *b) {
     return strcmp(*(const char **)a, *(const char **)b);
 }
@@ -52,7 +63,7 @@ int my_mkdir(char *var);
 int my_touch(char *var);
 int badcommandFileDoesNotExist();
 int my_cd(const char *dirname);
-int run(char *command, char *var);
+int run(char *command_args[], int args_size);
 
 // Interpret commands and their arguments
 int interpreter(char *command_args[], int args_size) {
@@ -123,9 +134,16 @@ int interpreter(char *command_args[], int args_size) {
         return my_touch(command_args[1]);
 
     } else if (strcmp(command_args[0], "my_cd") == 0) {
+        //my_cd
         if (args_size != 2)
             return badcommand();
         return my_cd(command_args[1]);
+
+    } else if (strcmp(command_args[0], "run") == 0) {
+        //run
+        if (args_size < 2)
+            return badcommand();
+        return run(command_args, args_size);
 
     } else
         return badcommand();
@@ -195,11 +213,11 @@ int source(char *script) {
 
 
 int echo(char *var) {
-    if (var[0] == '$') {
+    if (var[0] == '$') { //if the string starts with a '$', echo checks the variable of that name
         char *result = mem_get_value(&var[1]);
-        if (strcmp(result,"Variable does not exist")) {
+        if (strcmp(result,"Variable does not exist")) { //i.e if there IS a variable
             printf("%s\n", result);
-        } else {
+        } else { //i.e if there is no such a variable
             printf("\n");
         }
     } else {
@@ -216,42 +234,47 @@ int my_ls() {
 
     struct dirent *dircontents = readdir(directory);
 
+    //set len to the number of files/directories in the current directory
     int len = 0;
-    while (dircontents) {
+    while (dircontents) { //readdir return the next dirent object, and returns NULL after the last one
         len++;
         dircontents = readdir(directory);
     }
 
+    //put all of the directories' and files' names into an array
     char *files[len];
-    rewinddir(directory);
+    rewinddir(directory); //goes back to the dirent object for "."
     struct dirent *dircontents2 = readdir(directory);
-    for (int i = 0; i < len; i++) {
+    for (int i = 0; i < len; i++) { 
         files[i] = strdup(dircontents2->d_name);
         dircontents2 = readdir(directory);
     }
     closedir(directory);
 
+    //sort and print the array of names
     qsort(files,len, sizeof(char *),comp);
     for (int i = 0; i < len; i++) {
         printf("%s\n", files[i]);
-        free(files[i]);
+        free(files[i]); //we free the memory because we used strdup
     }
     return 0;
 }
 
 int my_mkdir(char *var) {
     int len = strlen(var);
-    for (int i = 1; i < len; i++){
+
+    //verify that at least all characters except the first one are alphanumeric
+    for (int i = 1; i < len; i++){ 
         if (!isalnum(var[i])) {
             return badcommandmkdir();
         }
     }
 
-    if (var[0] == '$') {
+    if (var[0] == '$') { //if the string starts with a '$', my_mkdir checks the variable of that name
         char *result = mem_get_value(&var[1]);
         if (strcmp(result,"Variable does not exist")) {
             int i = 0;
-            while (result[i] != '\0') {
+            while (result[i] != '\0') { //if the variable exists, this verifies that the contents are alphanumeric
                 if (!isalnum(result[i])) {
                     return badcommandmkdir();
                 }
@@ -261,7 +284,7 @@ int my_mkdir(char *var) {
             return 0;
         }
         
-    } else if (isalnum(var[0])) {
+    } else if (isalnum(var[0])) { // if the first character is alphanumeric then the whole string is and it can be used as the directory name
         mkdir(var,0755);
         return 0;
     }
@@ -270,7 +293,7 @@ int my_mkdir(char *var) {
 
 int my_touch(char *var) {
     int len = strlen(var);
-    for (int i = 1; i < len; i++){
+    for (int i = 1; i < len; i++){ // checks if the proposed filename is alphanumeric
         if (!isalnum(var[i])) {
             return badcommandmkdir();
         }
@@ -282,19 +305,34 @@ int my_touch(char *var) {
 }
 
 int my_cd(const char *dirname) {
-    for (int i = 0; i< strlen(dirname); i++){
+    for (int i = 0; i< strlen(dirname); i++){ // checks if the proposed directory name is alphanumeric
         if (!isalnum(dirname[i])){
             badcommandCD();
         }
     }
 
-    if (chdir(dirname)!= 0 ){
+    if (chdir(dirname)!= 0 ){ // chdir() returns 0 upon succesful completion
         badcommandCD();
     }
     return 0;
 }
 
-int run(char *command, char *var) {
-    
+int run(char *command_args[], int args_size) {
+    int pid = fork();
+
+    if (!pid) { // child process (pid = 0)
+        int i = 0;
+        char *arr[args_size];
+        for (i = 0; i < args_size - 1; i++) { //copy the arguments into a null-terminated array (arr)
+            arr[i] = command_args[i+1];
+        }
+        arr[i] = NULL;
+        
+        execvp(command_args[1], arr);
+        return badcommandrun();
+
+    } else { // parent process (pid != 0)
+        wait(0);
+    }
     return 0;
 }
