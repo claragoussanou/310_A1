@@ -227,14 +227,16 @@ int my_ls() {
     rewinddir(directory);
     struct dirent *dircontents2 = readdir(directory);
     for (int i = 0; i < len; i++) {
-        files[i] = dircontents2->d_name;
+        files[i] = strdup(dircontents2->d_name);
         dircontents2 = readdir(directory);
     }
     closedir(directory);
 
     qsort(files,len, sizeof(char *),comp);
-    for (int i = 0; i < len; i++)
+    for (int i = 0; i < len; i++) {
         printf("%s\n", files[i]);
+        free(files[i]);
+    }
     return 0;
 }
 
