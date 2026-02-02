@@ -211,9 +211,8 @@ int echo(char *var) {
 int my_ls() {
     DIR *directory = opendir(".");
     if (!directory) {
-        badcommandls();
-    }
-
+        return badcommandls();
+    } 
 
     struct dirent *dircontents = readdir(directory);
 
@@ -258,12 +257,12 @@ int my_mkdir(char *var) {
                 }
                 i++;
             }
-            mkdir(result,755);
+            mkdir(result,0755);
             return 0;
         }
         
     } else if (isalnum(var[0])) {
-        mkdir(var,755);
+        mkdir(var,0755);
         return 0;
     }
     return badcommandmkdir();
